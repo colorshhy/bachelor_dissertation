@@ -1,5 +1,21 @@
-
 \chapter{短文本对话Short Text Conversation}
+
+\begin{table}[htbp]
+\centering
+\caption{新浪微博一个典型帖子Post和它的评论Comment} \label{tab:example_STC}
+\begin{tabular}{|c|p{10cm}|}
+    \hline
+    \textbf{Post} & 创新工场三年庆，在我们的「智慧树」会议室。\par Today is the 3-year anniversary of Innovation Works. We are in the meeting room named Tree of Wisdom.  \\
+    \hline
+    \textbf{Comment 1} & 时间过得真快，创新工场都3年了！周年庆快乐！\par How time flies; Innovative Works is three years old! Happy Anniversary!\\
+    \hline
+	\textbf{Comment 2} & 小小智慧树，快乐做游戏，耶！\par Little Wisdom Tree, happy games, yeah! \\
+	\hline
+	\textbf{Comment 3} & 会议室挺气派，顶一个！\par The meeting room is quite impressive, the best one! \\
+	\hline
+\end{tabular}
+%\note{这里是表的注释}
+\end{table}
 人与电脑之间的自然语言交流是最具挑战性的AI问题之一，涉及语义理解，推理和常识知识的运用。尽管过去几十年来对人机交互研究工作进行了大量的努力，但令人遗憾的是，这个问题的进展非常有限。其中一个主要原因是缺乏大量的真实对话数据。
 
 在短文本对话任务中，我们只考虑一个简化版本的问题：由两个短文组成的一轮对话，前者是用户的初始帖子，后者是计算机给出的评论。我们把它称为短文本对话（STC）。由于在Twitter和微博等社交媒体上提供了大量短文本对话数据，我们预计在使用大数据的问题研究中可以取得重大进展，就像在机器翻译，社区问答等领域一样。随着社交媒体的出现和移动设备的广泛传播，通过短消息的对话已成为重要的沟通方式。许多现实中应用可以从短文本对话的研究中受益，例如手机上的自动消息回复，Siri等语音助手以及用于智能家居设备上各种聊天机器人。
@@ -10,6 +26,48 @@
 
 短文本对话（STC）的一个简单方法，也许是大部分人第一种想要尝试的方法，就是将其作为信息检索（IR）问题：维护一个大型的短文对话数据库，并开发主要基于信息检索（IR）技术的会话系统。给定一个初始帖子（Post）A，系统搜索语料库并返回最合适的评论（Cmt）。存储库中的评论（Cmt）最初是针对Post A以外的一些帖子发布的，但我们假设语料库足够大，包含了所有可能存在的帖子（Post），因此我们假设可以将其重新用于对A的合理评论（Cmt）。也就是说，我们处理更简单的基于检索的短文本对话（STC），而不是追求基于生成的短文本对话（STC），即从用户的初始帖子（Post）生成适当的评论（Cmt）。利用先进的信息检索（IR）技术和大数据，即使是基于检索的短文本对话（STC）系统也可能在每一轮会话中最终都会像人类一样表现出来。
 
+\subsection{任务描述}
+在本文的研究中，我们将短文本对话定义为一个信息检索问题，即基于检索的短文本对话。存储库我们也称为语料库，是有来自于微博的帖子-评论（Post-Cmt）对。在表\ref{tab:example_STC}中显示了一个微博帖子和三个对应它的评论。每个参赛队伍都会收到主办方事先准备好的语料库。值得注意的是，不仅一个帖子会对应多个评论，在对评论进行去重复处理编号后，会有不少评论对应了多个帖子。
+
+%\item 
+在\textbf{训练}期间，主办方会发布训练数据，他们是被人工标记评级过的帖子-评论对。关于人工标记评级，将在下一节阐述。我们要使用之间收到的语料库和这些被标记过的帖子-评论对作为训练数据，构造一个会话系统。
+ 
+%\item 
+在\textbf{测试}期间，每个参赛队伍对收到一个测试集，由一下微博帖子组成，每个帖子都被保证不在语料库中。我们需要为每个测试帖子提供十个结果（评论）的排名列表，而且这些评论必须来自于语料库。
+
+%\item 
+在\textbf{评估}期间，所有参赛团队提交的结果都会被匿名集合到一起人工标记。评估会使用信息检索分级相关的测量方法。
+
+在表\ref{tab:statistics_STC}显示了中文子任务中数据集的统计结果。在语料库中有差不多20万条微博帖子，每个帖子平均有30条评论，但是大概有100万帖子-评论对中的评论重复。主办方标记了225个帖子的作为训练数据，每个帖子平均大约有30个候选评论。有100个帖子作为测试数据，这些用于测试的帖子保证不再语料库中，参赛者需要搜索自己的会话系统，为每个测试帖子寻找10个评论和其排名作为结果。微博上原始网页的文本是中文的，为了帮助非华人参赛者，主办方提供了英文版本，所有的英文翻译都来自于机器翻译。华人参赛者也能收到英文版本作为参考。
+
+
+\begin{table}[htbp]
+\centering
+\caption{STC中文子任务数据集统计} \label{tab:statistics_STC}
+\begin{tabular}{|p{4cm}|l|r|}
+    \hline
+    \multirow{3}{4cm}{语料库 \linebreak Retrival Repository} & \#Posts & 196,495 \\ 
+	\cline{2-3}
+	& \#Comments & 4,637,926 \\ 
+	\cline{2-3}
+	& \#original pairs & 5,648,128 \\ 
+	\hline
+	\multirow{3}{4cm}{标记数据 \linebreak Labeled Data} & \#Posts & 225 \\ 
+	\cline{2-3}
+	& \#comments & 6,017 \\ 
+	\cline{2-3}
+	& \#labeled pairs & 6,017 \\ 
+	\hline
+	测试数据 Test Data & \#query posts & 100 \\
+	\hline
+\end{tabular}
+%\note{这里是表的注释}
+\end{table}
+	
+	
+%\subsection{相关评估}
+
+\subsection{研究想法}
 因此，我们想研究的关键问题是：给定一个新的帖子（Post），如何搜索语料库来返回适当的（即类似人的）评论？陈仲夏师兄，在NTCIR-12上给出了他的想法：假设语料库
 
 在我的论文研究中，主要针对信息检索的方法的前期工作，研究短文本的视觉表达提供了一种新的检索语料库的
